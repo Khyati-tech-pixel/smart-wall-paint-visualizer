@@ -13,18 +13,18 @@ import { AuthService } from '../../services/auth.service';
       <div class="auth-card card glass-panel">
         
         <!-- Header -->
-        <div class="auth-header text-center mb-6">
+        <div class="auth-header text-center mb-5">
           <div class="auth-logo">
             <i class="fa-solid fa-paintbrush"></i>
           </div>
-          <h2 class="auth-title mt-2">{{ isRegister ? 'Create Visualizer Account' : 'Welcome Back' }}</h2>
+          <h2 class="auth-title mt-2">{{ isRegister ? 'Create Account' : 'Welcome Back' }}</h2>
           <p class="auth-subtitle">Save custom room mockups, manage palettes, and access high-res exports.</p>
         </div>
 
         <!-- Quick 1-Click Demo Buttons -->
-        <div class="demo-box card mb-6">
+        <div class="demo-box card mb-5">
           <span class="demo-title">⚡ 1-Click Instant Demo Login:</span>
-          <div class="flex items-center gap-2 mt-2">
+          <div class="flex items-center gap-2 mt-2 flex-wrap">
             <button (click)="quickLoginUser()" class="btn btn-secondary btn-sm flex-1">
               <i class="fa-solid fa-user"></i>
               <span>Demo User</span>
@@ -37,7 +37,7 @@ import { AuthService } from '../../services/auth.service';
         </div>
 
         <!-- Tab Switcher -->
-        <div class="auth-tabs flex items-center mb-5">
+        <div class="auth-tabs flex items-center mb-4">
           <button 
             (click)="isRegister = false; errorMsg = ''" 
             class="tab-btn" 
@@ -84,7 +84,7 @@ import { AuthService } from '../../services/auth.service';
             <span>{{ errorMsg }}</span>
           </div>
 
-          <button type="submit" [disabled]="isLoading" class="btn btn-primary btn-lg mt-3 w-full">
+          <button type="submit" [disabled]="isLoading" class="btn btn-primary btn-lg mt-2 w-full">
             <i *ngIf="isLoading" class="fa-solid fa-spinner fa-spin"></i>
             <span>{{ isRegister ? 'Create Account' : 'Sign In' }}</span>
           </button>
@@ -95,33 +95,33 @@ import { AuthService } from '../../services/auth.service';
   `,
   styles: [`
     .auth-page {
-      min-height: calc(100vh - 180px);
-      padding: 3rem 1.5rem;
+      min-height: calc(100vh - 200px);
+      padding: 2.5rem 1rem 4rem;
     }
     .auth-card {
       width: 100%;
       max-width: 440px;
-      padding: 2.25rem;
+      padding: 2rem;
       box-shadow: var(--shadow-lg);
     }
     .auth-logo {
-      width: 48px;
-      height: 48px;
+      width: 46px;
+      height: 46px;
       border-radius: var(--radius-md);
       background: var(--accent-gradient);
       color: #FFFFFF;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       margin: 0 auto;
     }
     .auth-title {
-      font-size: 1.6rem;
+      font-size: 1.5rem;
       font-weight: 800;
     }
     .auth-subtitle {
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       color: var(--text-muted);
     }
     .demo-box {
@@ -130,7 +130,7 @@ import { AuthService } from '../../services/auth.service';
       padding: 0.85rem;
     }
     .demo-title {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 600;
       color: #818CF8;
     }
@@ -142,8 +142,8 @@ import { AuthService } from '../../services/auth.service';
     }
     .tab-btn {
       flex: 1;
-      padding: 0.5rem;
-      font-size: 0.88rem;
+      padding: 0.45rem;
+      font-size: 0.85rem;
       font-weight: 600;
       color: var(--text-muted);
       border-radius: var(--radius-sm);
@@ -158,14 +158,19 @@ import { AuthService } from '../../services/auth.service';
       background: rgba(239, 68, 68, 0.15);
       border: 1px solid rgba(239, 68, 68, 0.35);
       color: #EF4444;
-      padding: 0.65rem 1rem;
+      padding: 0.6rem 0.85rem;
       border-radius: var(--radius-md);
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.45rem;
     }
     .w-full { width: 100%; }
+
+    @media (max-width: 480px) {
+      .auth-card { padding: 1.5rem 1rem; }
+      .auth-title { font-size: 1.35rem; }
+    }
   `]
 })
 export class AuthComponent {

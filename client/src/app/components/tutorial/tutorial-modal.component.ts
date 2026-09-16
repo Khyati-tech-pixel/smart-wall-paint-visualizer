@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
       <div class="modal-card glass-panel">
         <!-- Header -->
         <div class="modal-header flex items-center justify-between">
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2">
             <div class="step-badge">{{ currentStep + 1 }} / {{ steps.length }}</div>
             <h3 class="modal-title">{{ steps[currentStep].title }}</h3>
           </div>
@@ -40,14 +40,14 @@ import { CommonModule } from '@angular/common';
         </div>
 
         <!-- Footer Navigation -->
-        <div class="modal-footer flex items-center justify-between">
+        <div class="modal-footer flex items-center justify-between gap-2">
           <button 
             (click)="prevStep()" 
             [disabled]="currentStep === 0" 
             class="btn btn-secondary btn-sm"
           >
             <i class="fa-solid fa-arrow-left"></i>
-            <span>Previous</span>
+            <span class="hidden-xs">Prev</span>
           </button>
 
           <!-- Step Indicators -->
@@ -74,7 +74,7 @@ import { CommonModule } from '@angular/common';
             (click)="close.emit()" 
             class="btn btn-accent btn-sm"
           >
-            <span>Start Designing!</span>
+            <span>Start!</span>
             <i class="fa-solid fa-wand-magic-sparkles"></i>
           </button>
         </div>
@@ -85,35 +85,39 @@ import { CommonModule } from '@angular/common';
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(9, 13, 22, 0.82);
+      background: rgba(9, 13, 22, 0.85);
       backdrop-filter: blur(8px);
       z-index: 200;
       padding: 1rem;
+      overflow-y: auto;
     }
     .modal-card {
       width: 100%;
-      max-width: 580px;
+      max-width: 540px;
       background: var(--bg-surface);
       border: 1px solid var(--border-highlight);
       border-radius: var(--radius-xl);
-      padding: 1.75rem;
+      padding: 1.5rem;
       box-shadow: var(--shadow-lg);
+      max-height: 90vh;
+      overflow-y: auto;
     }
     .modal-header {
-      padding-bottom: 1.25rem;
+      padding-bottom: 1rem;
       border-bottom: 1px solid var(--border-subtle);
     }
     .step-badge {
       background: rgba(99, 102, 241, 0.2);
       color: #818CF8;
       border: 1px solid rgba(99, 102, 241, 0.35);
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 700;
-      padding: 0.25rem 0.65rem;
+      padding: 0.2rem 0.55rem;
       border-radius: var(--radius-full);
+      white-space: nowrap;
     }
     .modal-title {
-      font-size: 1.25rem;
+      font-size: 1.15rem;
       font-weight: 700;
     }
     .close-btn {
@@ -125,63 +129,64 @@ import { CommonModule } from '@angular/common';
       justify-content: center;
       color: var(--text-muted);
       transition: all var(--transition-fast);
+      flex-shrink: 0;
     }
     .close-btn:hover {
       color: var(--text-main);
       background: rgba(255, 255, 255, 0.08);
     }
     .modal-body {
-      padding: 1.5rem 0;
+      padding: 1.25rem 0;
     }
     .step-illustration {
       text-align: center;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1rem;
     }
     .icon-circle {
-      width: 64px;
-      height: 64px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
-      margin: 0 auto 0.75rem;
+      margin: 0 auto 0.6rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.6rem;
+      font-size: 1.4rem;
       color: #FFFFFF;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
     }
     .step-subtitle {
-      font-size: 1.05rem;
+      font-size: 0.98rem;
       font-weight: 600;
       color: var(--text-main);
     }
     .step-details {
       background: var(--bg-card);
-      padding: 1.25rem;
+      padding: 1rem;
     }
     .step-description {
-      font-size: 0.95rem;
+      font-size: 0.88rem;
       color: var(--text-muted);
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
       line-height: 1.5;
     }
     .step-tips {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.4rem;
     }
     .step-tips li {
       display: flex;
       align-items: center;
-      gap: 0.65rem;
-      font-size: 0.9rem;
+      gap: 0.5rem;
+      font-size: 0.85rem;
       color: var(--text-main);
     }
     .text-success {
       color: #10B981;
     }
     .modal-footer {
-      padding-top: 1.25rem;
+      padding-top: 1rem;
       border-top: 1px solid var(--border-subtle);
     }
     .dot {
@@ -193,9 +198,15 @@ import { CommonModule } from '@angular/common';
       transition: all var(--transition-fast);
     }
     .dot.active {
-      width: 24px;
+      width: 20px;
       border-radius: var(--radius-full);
       background: var(--accent-primary);
+    }
+
+    @media (max-width: 480px) {
+      .modal-card { padding: 1.2rem 0.85rem; }
+      .modal-title { font-size: 1rem; }
+      .hidden-xs { display: none; }
     }
   `]
 })
@@ -206,7 +217,7 @@ export class TutorialModalComponent {
   steps = [
     {
       title: 'Step 1: Choose Your Room',
-      subtitle: 'Upload a real room photo or select a sample room',
+      subtitle: 'Upload a real photo or select a sample room',
       icon: 'fa-solid fa-cloud-arrow-up',
       accent: 'linear-gradient(135deg, #3B82F6, #06B6D4)',
       description: 'Start by uploading any JPG or PNG photo of your living room, bedroom, dining area, or kitchen. Alternatively, try out our built-in curated architectural room templates.',
@@ -217,13 +228,13 @@ export class TutorialModalComponent {
     },
     {
       title: 'Step 2: Mark Wall Areas',
-      subtitle: 'Use the Polygon Tool to click along wall corners',
+      subtitle: 'Use the Polygon Tool to tap along wall corners',
       icon: 'fa-solid fa-draw-polygon',
       accent: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
-      description: 'Select the Polygon tool and click along the perimeter of the wall you want to paint. To complete the outline, simply click back on the starting point (highlighted in green).',
+      description: 'Select the Polygon tool and tap along the perimeter of the wall you want to paint. To complete the outline, simply tap back on the starting point (highlighted in green).',
       tips: [
-        'Click each corner of the wall to outline the polygon',
-        'After closing, drag any point to fine-tune alignment',
+        'Tap each corner of the wall to outline the polygon',
+        'After closing, drag any point with your finger to fine-tune alignment',
         'Add multiple wall layers for accent walls and side walls'
       ]
     },

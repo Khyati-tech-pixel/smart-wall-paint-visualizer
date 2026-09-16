@@ -12,14 +12,14 @@ import { RoomProject } from '../../models/project.model';
   template: `
     <div class="projects-page container">
       <!-- Top Title Bar -->
-      <div class="page-header flex items-center justify-between mb-6">
+      <div class="page-header flex items-center justify-between mb-5">
         <div>
           <span class="badge badge-primary">Design Portfolio</span>
           <h1 class="page-title mt-1">My Saved Room Designs</h1>
           <p class="page-subtitle">Revisit your saved color trials, download painter plans, or continue editing in studio.</p>
         </div>
 
-        <a routerLink="/visualizer" class="btn btn-primary">
+        <a routerLink="/visualizer" class="btn btn-primary new-btn">
           <i class="fa-solid fa-plus"></i>
           <span>New Room Design</span>
         </a>
@@ -32,7 +32,7 @@ import { RoomProject } from '../../models/project.model';
         </div>
         <h3 class="text-xl font-bold mb-2">Sign In to Access Your Saved Designs</h3>
         <p class="text-muted mb-4">Saved designs are securely associated with your user account.</p>
-        <div class="flex items-center justify-center gap-3">
+        <div class="flex items-center justify-center gap-3 flex-wrap">
           <button (click)="loginDemoUser()" class="btn btn-primary">
             <span>Instant Demo Login</span>
           </button>
@@ -110,35 +110,35 @@ import { RoomProject } from '../../models/project.model';
   `,
   styles: [`
     .projects-page {
-      padding: 2rem 1.5rem 5rem;
+      padding: 1.5rem 1.5rem 5rem;
     }
     .page-title {
       font-size: 2.2rem;
       font-weight: 800;
     }
     .page-subtitle {
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       color: var(--text-muted);
     }
     .guest-card {
-      padding: 3rem 2rem;
+      padding: 2.5rem 1.5rem;
     }
     .guest-icon {
-      width: 56px;
-      height: 56px;
+      width: 52px;
+      height: 52px;
       border-radius: 50%;
       background: rgba(99, 102, 241, 0.15);
       color: #818CF8;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5rem;
-      margin: 0 auto 1.25rem;
+      font-size: 1.4rem;
+      margin: 0 auto 1rem;
     }
     .projects-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 1.75rem;
+      gap: 1.5rem;
     }
     .project-card {
       padding: 0;
@@ -147,7 +147,7 @@ import { RoomProject } from '../../models/project.model';
       flex-direction: column;
     }
     .project-preview {
-      height: 200px;
+      height: 190px;
       position: relative;
       background: #000;
       overflow: hidden;
@@ -159,30 +159,30 @@ import { RoomProject } from '../../models/project.model';
     }
     .room-type-tag {
       position: absolute;
-      top: 0.75rem;
-      left: 0.75rem;
+      top: 0.65rem;
+      left: 0.65rem;
       background: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(6px);
-      padding: 0.25rem 0.65rem;
+      padding: 0.2rem 0.6rem;
       border-radius: var(--radius-full);
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 600;
       color: #38BDF8;
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .project-info {
-      padding: 1.25rem;
+      padding: 1.15rem;
       flex: 1;
       display: flex;
       flex-direction: column;
     }
     .project-title {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 700;
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.2rem;
     }
     .project-date {
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       color: var(--text-subtle);
     }
     .swatch-dot {
@@ -190,50 +190,63 @@ import { RoomProject } from '../../models/project.model';
       height: 18px;
       border-radius: 50%;
       border: 1.5px solid #FFFFFF;
+      flex-shrink: 0;
     }
     .project-actions {
       border-top: 1px solid var(--border-subtle);
     }
     .btn-icon {
-      width: 34px;
-      height: 34px;
+      width: 36px;
+      height: 36px;
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--text-muted);
       transition: all var(--transition-fast);
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      margin-left: 0.35rem;
     }
     .btn-icon:hover {
       color: var(--text-main);
       background: rgba(255, 255, 255, 0.08);
     }
     .empty-state {
-      padding: 4rem 2rem;
+      padding: 3rem 1.5rem;
     }
     .empty-icon {
-      font-size: 3rem;
+      font-size: 2.8rem;
       color: var(--text-subtle);
-      margin-bottom: 1rem;
+      margin-bottom: 0.85rem;
     }
     .toast-feedback {
       position: fixed;
-      bottom: 2rem;
-      right: 2rem;
+      bottom: calc(75px + var(--safe-bottom));
+      right: 1.5rem;
       background: #10B981;
       color: #FFFFFF;
-      padding: 0.7rem 1.4rem;
+      padding: 0.65rem 1.25rem;
       border-radius: var(--radius-full);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.45rem;
       box-shadow: var(--shadow-lg);
       z-index: 999;
     }
-    @media (max-width: 900px) {
+
+    @media (max-width: 1024px) {
+      .projects-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    }
+    @media (max-width: 768px) {
+      .page-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+      .new-btn { width: 100%; }
       .projects-grid { grid-template-columns: 1fr; }
+      .projects-page { padding: 1rem 0.75rem 4rem; }
+      .page-title { font-size: 1.6rem; }
+      .toast-feedback { right: 1rem; left: 1rem; justify-content: center; }
     }
   `]
 })
@@ -255,46 +268,53 @@ export class ProjectsComponent implements OnInit {
 
   loadProjects() {
     this.projectService.getUserProjects().subscribe({
-      next: (projs) => (this.projects = projs),
+      next: (projs: RoomProject[]) => (this.projects = projs),
       error: () => {}
     });
   }
 
   loginDemoUser() {
-    this.authService.loginDemoUser().subscribe(() => {
-      this.loadProjects();
+    this.authService.loginDemoUser().subscribe({
+      next: () => this.loadProjects()
     });
   }
 
   openInStudio(proj: RoomProject) {
-    this.router.navigate(['/visualizer'], {
-      queryParams: { projectId: proj._id || proj.id }
-    });
+    if (proj.originalImage && proj.originalImage !== 'custom_upload') {
+      this.router.navigate(['/visualizer'], { queryParams: { sampleId: proj.originalImage } });
+    } else {
+      this.router.navigate(['/visualizer']);
+    }
   }
 
   downloadDesign(proj: RoomProject) {
-    if (!proj.previewImage) return;
-    const link = document.createElement('a');
-    link.download = `${proj.title.replace(/\s+/g, '_')}.jpg`;
-    link.href = proj.previewImage;
-    link.click();
-    this.showToast('Downloaded room design image!');
+    if (proj.previewImage) {
+      const link = document.createElement('a');
+      link.download = `${proj.title.replace(/\s+/g, '_')}_design.jpg`;
+      link.href = proj.previewImage;
+      link.click();
+      this.showToast('Downloaded room design preview!');
+    }
   }
 
   deleteProject(proj: RoomProject) {
-    const id = proj._id || proj.id;
-    if (!id) return;
-    if (confirm(`Are you sure you want to delete "${proj.title}"?`)) {
-      this.projectService.deleteProject(id).subscribe(() => {
-        this.projects = this.projects.filter(p => (p._id || p.id) !== id);
-        this.showToast('Project removed');
+    if (!proj._id) return;
+    const projId = proj._id;
+    if (confirm(`Delete design "${proj.title}"?`)) {
+      this.projectService.deleteProject(projId).subscribe({
+        next: () => {
+          this.projects = this.projects.filter(p => p._id !== projId);
+          this.showToast('Design deleted');
+        },
+        error: () => this.showToast('Could not delete design')
       });
     }
   }
 
+
   formatDate(d?: string) {
     if (!d) return '';
-    return new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
   showToast(msg: string) {

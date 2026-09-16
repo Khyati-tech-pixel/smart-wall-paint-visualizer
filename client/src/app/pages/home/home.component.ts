@@ -432,16 +432,45 @@ import { SampleRoom } from '../../models/project.model';
     }
 
     @media (max-width: 1024px) {
-      .hero-grid { grid-template-columns: 1fr; }
-      .features-grid { grid-template-columns: repeat(2, 1fr); }
-      .samples-grid { grid-template-columns: repeat(2, 1fr); }
+      .hero-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .features-grid { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
+      .samples-grid { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
       .hero-title { font-size: 2.5rem; }
     }
-    @media (max-width: 640px) {
-      .features-grid { grid-template-columns: 1fr; }
+    @media (max-width: 768px) {
+      .hero-section { padding: 2.5rem 0 3rem; }
+      .hero-title { font-size: 2rem; margin-bottom: 1rem; }
+      .hero-subtitle { font-size: 0.98rem; margin-bottom: 1.5rem; }
+      .hero-cta { flex-direction: column; width: 100%; gap: 0.75rem; }
+      .hero-cta .btn { width: 100%; }
+      .trust-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+        text-align: center;
+        margin-top: 1.75rem;
+      }
+      .metric-divider { display: none; }
+      .metric-value { font-size: 1.4rem; }
+      .metric-label { font-size: 0.72rem; }
+      .features-section { padding: 3rem 0; }
+      .features-grid { grid-template-columns: 1fr; margin-top: 2rem; }
+      .samples-section { padding: 2.5rem 0; }
       .samples-grid { grid-template-columns: 1fr; }
-      .cta-card { flex-direction: column; gap: 1.5rem; text-align: center; }
+      .section-header.flex { flex-direction: column; align-items: flex-start; gap: 1rem; }
+      .cta-section { padding: 2rem 0; }
+      .cta-card { padding: 2rem 1.25rem; flex-direction: column; gap: 1.25rem; text-align: center; }
+      .cta-title { font-size: 1.5rem; }
+      .cta-desc { font-size: 0.92rem; }
+      .cta-card .btn { width: 100%; }
     }
+    @media (max-width: 480px) {
+      .hero-title { font-size: 1.75rem; }
+      .trust-metrics { grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+      .trust-metrics .metric-item:last-child { grid-column: span 2; }
+      .demo-swatch { width: 28px; height: 28px; }
+    }
+
   `]
 })
 export class HomeComponent implements OnInit {

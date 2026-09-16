@@ -17,44 +17,51 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
   template: `
     <div class="visualizer-page">
       <!-- Studio Top Action Bar -->
-      <div class="studio-topbar glass-panel flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <button (click)="fileInput.click()" class="btn btn-primary btn-sm">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <span>Upload Room Photo</span>
-          </button>
-          <input #fileInput type="file" accept="image/png, image/jpeg, image/webp" (change)="onFileUpload($event)" style="display: none">
+      <div class="studio-topbar glass-panel">
+        <!-- Top Row Controls -->
+        <div class="topbar-row-main flex items-center justify-between gap-2">
+          <!-- Left: Upload & Template -->
+          <div class="topbar-left-group flex items-center gap-2">
+            <button (click)="fileInput.click()" class="btn btn-primary btn-sm upload-btn" title="Upload Room Photo from Gallery / Camera">
+              <i class="fa-solid fa-camera"></i>
+              <span class="btn-text">Upload Room</span>
+            </button>
+            <input #fileInput type="file" accept="image/png, image/jpeg, image/webp" (change)="onFileUpload($event)" style="display: none">
 
-          <!-- Sample Room Quick Dropdown -->
-          <div class="flex items-center gap-2">
-            <label class="topbar-label">Template:</label>
-            <select [(ngModel)]="selectedSampleId" (change)="loadSampleRoom(selectedSampleId)" class="form-select select-sm">
-              <option value="custom" disabled *ngIf="isCustomImage">Custom Uploaded Photo</option>
-              <option *ngFor="let s of sampleRooms" [value]="s.id">{{ s.name }} ({{ s.type }})</option>
-            </select>
+            <!-- Sample Room Dropdown -->
+            <div class="template-selector flex items-center gap-1">
+              <span class="topbar-label hidden-xs"><i class="fa-solid fa-shapes"></i></span>
+              <select [(ngModel)]="selectedSampleId" (change)="loadSampleRoom(selectedSampleId)" class="form-select select-sm template-select">
+                <option value="custom" disabled *ngIf="isCustomImage">📷 Custom Upload</option>
+                <option *ngFor="let s of sampleRooms" [value]="s.id">{{ s.name }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Right: Studio Actions (Compare, Export, Save) -->
+          <div class="topbar-actions flex items-center gap-1">
+            <button (click)="openCompare()" class="btn btn-secondary btn-sm action-btn" title="Interactive Before & After slider">
+              <i class="fa-solid fa-table-columns"></i>
+              <span class="btn-text">Compare</span>
+            </button>
+            <button (click)="exportImage()" class="btn btn-secondary btn-sm action-btn" title="Download high-resolution image with color card">
+              <i class="fa-solid fa-download"></i>
+              <span class="btn-text">Export</span>
+            </button>
+            <button (click)="saveProject()" [disabled]="isSaving" class="btn btn-accent btn-sm action-btn" title="Save this design to your account">
+              <i class="fa-solid" [class.fa-floppy-disk]="!isSaving" [class.fa-spinner]="isSaving" [class.fa-spin]="isSaving"></i>
+              <span class="btn-text">{{ isSaving ? 'Saving...' : 'Save' }}</span>
+            </button>
           </div>
         </div>
 
-        <!-- Project Title -->
-        <div class="project-title-box flex items-center gap-2">
-          <input [(ngModel)]="projectTitle" class="title-input" placeholder="Project Name (e.g., Living Room Makeover)">
-          <span class="badge badge-neutral">{{ roomType }}</span>
-        </div>
-
-        <!-- Top Right Actions -->
-        <div class="flex items-center gap-2">
-          <button (click)="openCompare()" class="btn btn-secondary btn-sm" title="Interactive Before & After slider">
-            <i class="fa-solid fa-table-columns"></i>
-            <span>Compare</span>
-          </button>
-          <button (click)="exportImage()" class="btn btn-secondary btn-sm" title="Download high-resolution image with color card">
-            <i class="fa-solid fa-download"></i>
-            <span>Export Plan</span>
-          </button>
-          <button (click)="saveProject()" [disabled]="isSaving" class="btn btn-accent btn-sm">
-            <i class="fa-solid" [class.fa-floppy-disk]="!isSaving" [class.fa-spinner]="isSaving" [class.fa-spin]="isSaving"></i>
-            <span>{{ isSaving ? 'Saving...' : 'Save Design' }}</span>
-          </button>
+        <!-- Project Title Row -->
+        <div class="topbar-row-title flex items-center justify-between gap-2 mt-2 pt-2">
+          <div class="project-title-box flex items-center gap-2 flex-1">
+            <i class="fa-solid fa-pen text-subtle text-xs"></i>
+            <input [(ngModel)]="projectTitle" class="title-input" placeholder="Project Name (e.g., Living Room Makeover)">
+          </div>
+          <span class="badge badge-neutral room-badge">{{ roomType }}</span>
         </div>
       </div>
 
@@ -63,17 +70,17 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
         
         <!-- Left: Interactive Canvas Viewport -->
         <div class="canvas-viewport card">
-          <!-- Canvas Toolbar Floating Pill -->
+          <!-- Canvas Toolbar Floating Bar -->
           <div class="canvas-toolbar glass-panel flex items-center justify-between">
-            <div class="flex items-center gap-1">
+            <div class="tools-group flex items-center gap-1 touch-scroll-x">
               <button 
                 (click)="activeTool = 'polygon'" 
                 class="tool-btn" 
                 [class.active]="activeTool === 'polygon'"
-                title="Polygon Wall Selection (Click to add points, click start to close)"
+                title="Polygon Tool (Tap wall corners to outline)"
               >
                 <i class="fa-solid fa-draw-polygon"></i>
-                <span>Polygon Tool</span>
+                <span>Polygon</span>
               </button>
 
               <button 
@@ -104,26 +111,39 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
               <button (click)="redo()" [disabled]="historyIndex >= history.length - 1" class="tool-btn-icon" title="Redo">
                 <i class="fa-solid fa-rotate-right"></i>
               </button>
-              <button (click)="clearCurrentWallMask()" class="tool-btn-icon text-danger" title="Clear active wall outline">
+              <button (click)="clearCurrentWallMask()" class="tool-btn-icon text-danger" title="Clear current wall outline">
                 <i class="fa-solid fa-trash"></i>
               </button>
             </div>
 
             <!-- Hint text -->
-            <div class="canvas-hint">
+            <div class="canvas-hint hidden-mobile">
               <span *ngIf="activeTool === 'polygon' && !isPolygonClosed">
-                <i class="fa-regular fa-hand-pointer"></i> Click wall corners to outline. Click first point (green) to close.
+                <i class="fa-regular fa-hand-pointer"></i> Tap wall corners to outline. Tap first point (green) to close.
               </span>
               <span *ngIf="activeTool === 'polygon' && isPolygonClosed">
                 <i class="fa-solid fa-circle-check text-success"></i> Wall enclosed. Drag points to adjust or choose paint!
               </span>
               <span *ngIf="activeTool === 'brush'">
-                <i class="fa-solid fa-paint-brush"></i> Click & drag freehand over wall area.
+                <i class="fa-solid fa-paint-brush"></i> Drag freehand over wall area.
               </span>
             </div>
           </div>
 
-          <!-- Canvas Element -->
+          <!-- Mobile Canvas Hint Pill -->
+          <div class="mobile-hint-pill only-mobile">
+            <span *ngIf="activeTool === 'polygon' && !isPolygonClosed">
+              <i class="fa-regular fa-hand-pointer text-accent"></i> Tap wall corners. Tap green point to close.
+            </span>
+            <span *ngIf="activeTool === 'polygon' && isPolygonClosed">
+              <i class="fa-solid fa-circle-check text-success"></i> Wall enclosed! Drag points or pick color below.
+            </span>
+            <span *ngIf="activeTool === 'brush'">
+              <i class="fa-solid fa-paint-brush"></i> Drag finger over wall area.
+            </span>
+          </div>
+
+          <!-- Canvas Element with Mouse & Touch Event Bindings -->
           <div class="canvas-wrapper" #canvasWrapper>
             <canvas 
               #mainCanvas 
@@ -131,11 +151,15 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
               (mousemove)="onCanvasMouseMove($event)"
               (mouseup)="onCanvasMouseUp($event)"
               (mouseleave)="onCanvasMouseLeave($event)"
+              (touchstart)="onCanvasTouchStart($event)"
+              (touchmove)="onCanvasTouchMove($event)"
+              (touchend)="onCanvasTouchEnd($event)"
+              (touchcancel)="onCanvasTouchEnd($event)"
               class="main-canvas"
             ></canvas>
           </div>
 
-          <!-- Notification Banner -->
+          <!-- Notification Toast Banner -->
           <div *ngIf="statusMessage" class="status-toast animate-fade">
             <i class="fa-solid fa-circle-info"></i>
             <span>{{ statusMessage }}</span>
@@ -143,12 +167,56 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
         </div>
 
         <!-- Right: Wall Layers & Color Palettes Panel -->
-        <div class="studio-sidebar flex flex-col gap-4">
+        <div class="studio-sidebar flex flex-col gap-3">
 
-          <!-- Section 1: Wall Layers Selector -->
-          <div class="sidebar-section card">
+          <!-- Mobile Navigation Tabs Switcher (Visible on Tablets & Phones) -->
+          <div class="mobile-sidebar-tabs glass-panel only-mobile">
+            <div class="tabs-scroll-row flex items-center justify-between">
+              <button 
+                (click)="mobileTab = 'colors'" 
+                class="mobile-tab-btn"
+                [class.active]="mobileTab === 'colors'"
+              >
+                <i class="fa-solid fa-palette"></i>
+                <span>Paint Shades</span>
+              </button>
+
+              <button 
+                (click)="mobileTab = 'finish'" 
+                class="mobile-tab-btn"
+                [class.active]="mobileTab === 'finish'"
+              >
+                <i class="fa-solid fa-sliders"></i>
+                <span>Finish & Split</span>
+              </button>
+
+              <button 
+                (click)="mobileTab = 'walls'" 
+                class="mobile-tab-btn"
+                [class.active]="mobileTab === 'walls'"
+              >
+                <i class="fa-solid fa-layer-group"></i>
+                <span>Zones ({{ walls.length }})</span>
+              </button>
+
+              <button 
+                (click)="mobileTab = 'patterns'" 
+                class="mobile-tab-btn"
+                [class.active]="mobileTab === 'patterns'"
+              >
+                <i class="fa-solid fa-border-all"></i>
+                <span>Wallpapers</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- SECTION 1: Wall Layers Selector -->
+          <div class="sidebar-section card" [class.hidden-on-mobile]="mobileTab !== 'walls'">
             <div class="section-title-row flex items-center justify-between mb-3">
-              <h4 class="section-heading">Wall Zones</h4>
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-layer-group text-accent"></i>
+                <h4 class="section-heading">Wall Zones</h4>
+              </div>
               <button (click)="addNewWallLayer()" class="btn btn-secondary btn-sm" title="Add another wall zone">
                 <i class="fa-solid fa-plus"></i>
                 <span>Add Wall</span>
@@ -181,9 +249,12 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
             </div>
           </div>
 
-          <!-- Section 2: Paint Finish, Opacity & Dual Tone -->
-          <div class="sidebar-section card">
-            <h4 class="section-heading mb-3">Finish & Effects</h4>
+          <!-- SECTION 2: Paint Finish, Opacity & Dual Tone -->
+          <div class="sidebar-section card" [class.hidden-on-mobile]="mobileTab !== 'finish'">
+            <div class="flex items-center gap-2 mb-3">
+              <i class="fa-solid fa-sliders text-accent"></i>
+              <h4 class="section-heading">Finish & Lighting Effects</h4>
+            </div>
             
             <!-- Opacity Slider -->
             <div class="form-group mb-3">
@@ -237,14 +308,14 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
                     class="btn btn-secondary btn-sm flex-1"
                     [class.active-split]="dualTone.orientation === 'horizontal'"
                   >
-                    Horizontal Split
+                    Horizontal
                   </button>
                   <button 
                     (click)="dualTone.orientation = 'vertical'; renderCanvas()" 
                     class="btn btn-secondary btn-sm flex-1"
                     [class.active-split]="dualTone.orientation === 'vertical'"
                   >
-                    Vertical Split
+                    Vertical
                   </button>
                 </div>
                 <div class="form-group mb-0">
@@ -265,9 +336,9 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
             </div>
           </div>
 
-          <!-- Section 3: Color Palette & Wallpaper Drawer -->
-          <div class="sidebar-section card flex-1 flex flex-col">
-            <div class="tabs-header flex items-center gap-2 mb-3">
+          <!-- SECTION 3: Paint Shades Palette (Desktop tabbed / Mobile direct) -->
+          <div class="sidebar-section card flex-1 flex flex-col" [class.hidden-on-mobile]="mobileTab !== 'colors' && mobileTab !== 'patterns'">
+            <div class="tabs-header flex items-center gap-2 mb-3 hidden-mobile">
               <button 
                 (click)="paletteTab = 'colors'" 
                 class="tab-btn" 
@@ -287,23 +358,23 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
             </div>
 
             <!-- TAB 1: Paint Colors -->
-            <div *ngIf="paletteTab === 'colors'" class="palette-tab flex-1 flex flex-col">
+            <div *ngIf="(paletteTab === 'colors' && !isMobile) || (isMobile && mobileTab === 'colors')" class="palette-tab flex-1 flex flex-col">
               <!-- Search & Filter Controls -->
-              <div class="palette-filters flex items-center gap-2 mb-3">
+              <div class="palette-filters flex items-center gap-2 mb-3 flex-wrap">
                 <input 
                   [(ngModel)]="searchQuery" 
                   (input)="filterColors()" 
                   placeholder="Search name, code, hex..." 
                   class="form-input search-sm flex-1"
                 >
-                <select [(ngModel)]="selectedCategory" (change)="filterColors()" class="form-select select-sm">
+                <select [(ngModel)]="selectedCategory" (change)="filterColors()" class="form-select select-sm category-select">
                   <option value="All">All Categories</option>
                   <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
                 </select>
               </div>
 
-              <!-- Brand Filter Buttons -->
-              <div class="brand-pills flex items-center gap-1 mb-3">
+              <!-- Brand Filter Pills (Scrollable) -->
+              <div class="brand-pills flex items-center gap-1 mb-3 touch-scroll-x">
                 <button 
                   *ngFor="let b of ['All', 'Behr', 'Asian Paints', 'Dulux']" 
                   (click)="selectedBrand = b; filterColors()"
@@ -331,7 +402,7 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
             </div>
 
             <!-- TAB 2: Wallpaper Patterns -->
-            <div *ngIf="paletteTab === 'patterns'" class="patterns-tab">
+            <div *ngIf="(paletteTab === 'patterns' && !isMobile) || (isMobile && mobileTab === 'patterns')" class="patterns-tab">
               <p class="text-subtle text-xs mb-3">Select seamless decorative wallpaper texture overlay:</p>
               <div class="patterns-grid">
                 <div 
@@ -356,69 +427,75 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
   `,
   styles: [`
     .visualizer-page {
-      padding: 1rem 1.5rem 3rem;
+      padding: 0.75rem 1.25rem 2rem;
       display: flex;
       flex-direction: column;
-      gap: 1rem;
+      gap: 0.85rem;
     }
     .studio-topbar {
-      padding: 0.75rem 1.25rem;
+      padding: 0.75rem 1rem;
     }
     .topbar-label {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
       font-weight: 500;
     }
     .select-sm {
-      padding: 0.4rem 0.8rem;
-      font-size: 0.85rem;
+      padding: 0.4rem 0.65rem;
+      font-size: 0.82rem;
+    }
+    .template-select {
+      max-width: 170px;
     }
     .project-title-box {
-      flex: 1;
-      max-width: 380px;
-      margin: 0 1.5rem;
+      margin: 0;
     }
     .title-input {
       background: transparent;
       border: none;
       border-bottom: 1px dashed var(--border-highlight);
       font-family: var(--font-heading);
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 700;
       color: var(--text-main);
-      padding: 0.2rem 0;
+      padding: 0.15rem 0;
       width: 100%;
     }
     .title-input:focus {
       outline: none;
       border-bottom-color: var(--accent-primary);
     }
+    .room-badge {
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
     .studio-workspace {
       display: grid;
       grid-template-columns: 1fr 380px;
-      gap: 1.25rem;
+      gap: 1rem;
       align-items: start;
     }
     .canvas-viewport {
-      padding: 0.75rem;
+      padding: 0.65rem;
       position: relative;
       display: flex;
       flex-direction: column;
     }
     .canvas-toolbar {
-      padding: 0.5rem 0.85rem;
-      margin-bottom: 0.75rem;
+      padding: 0.45rem 0.65rem;
+      margin-bottom: 0.65rem;
     }
     .tool-btn {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      padding: 0.4rem 0.8rem;
+      gap: 0.35rem;
+      padding: 0.4rem 0.75rem;
       border-radius: var(--radius-sm);
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 600;
       color: var(--text-muted);
       transition: all var(--transition-fast);
+      white-space: nowrap;
     }
     .tool-btn:hover {
       color: var(--text-main);
@@ -431,9 +508,10 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
     }
     .tool-divider {
       width: 1px;
-      height: 24px;
+      height: 22px;
       background: var(--border-subtle);
-      margin: 0 0.4rem;
+      margin: 0 0.3rem;
+      flex-shrink: 0;
     }
     .tool-btn-icon {
       width: 32px;
@@ -444,6 +522,7 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
       justify-content: center;
       color: var(--text-muted);
       transition: all var(--transition-fast);
+      flex-shrink: 0;
     }
     .tool-btn-icon:hover:not(:disabled) {
       color: var(--text-main);
@@ -454,14 +533,29 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
       cursor: not-allowed;
     }
     .text-danger { color: #EF4444 !important; }
+    .text-accent { color: #818CF8 !important; }
+    .text-success { color: #10B981 !important; }
     .canvas-hint {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-left: 0.5rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .mobile-hint-pill {
+      background: rgba(16, 22, 35, 0.8);
+      border: 1px solid var(--border-subtle);
+      padding: 0.3rem 0.65rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
       color: var(--text-muted);
     }
-    .text-success { color: #10B981; }
     .canvas-wrapper {
       width: 100%;
-      height: 640px;
+      height: min(65vh, 600px);
       background: #000000;
       border-radius: var(--radius-md);
       overflow: hidden;
@@ -469,6 +563,8 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
       align-items: center;
       justify-content: center;
       position: relative;
+      touch-action: none;
+      user-select: none;
     }
     .main-canvas {
       cursor: crosshair;
@@ -476,39 +572,77 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
       width: 100%;
       height: 100%;
       object-fit: contain;
+      touch-action: none;
     }
     .status-toast {
       position: absolute;
-      bottom: 1.5rem;
+      bottom: 1rem;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(16, 22, 35, 0.95);
       border: 1px solid var(--accent-primary);
       box-shadow: var(--shadow-lg);
-      padding: 0.6rem 1.25rem;
+      padding: 0.5rem 1rem;
       border-radius: var(--radius-full);
-      font-size: 0.88rem;
+      font-size: 0.82rem;
       font-weight: 500;
       color: #FFFFFF;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
       z-index: 20;
+      width: max-content;
+      max-width: 90%;
+      text-align: center;
     }
+
+    /* Mobile Segmented Sidebar Tabs */
+    .mobile-sidebar-tabs {
+      padding: 0.3rem;
+      border-radius: var(--radius-md);
+    }
+    .tabs-scroll-row {
+      display: flex;
+      gap: 0.25rem;
+    }
+    .mobile-tab-btn {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.15rem;
+      padding: 0.45rem 0.2rem;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      transition: all var(--transition-fast);
+      background: var(--bg-card);
+    }
+    .mobile-tab-btn i {
+      font-size: 0.85rem;
+    }
+    .mobile-tab-btn.active {
+      background: var(--accent-primary);
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+    }
+
     /* Studio Sidebar */
     .studio-sidebar {
-      height: calc(100vh - 150px);
+      height: calc(100vh - 170px);
       overflow-y: auto;
     }
     .sidebar-section {
-      padding: 1.25rem;
+      padding: 1rem;
     }
     .section-heading {
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 700;
     }
     .wall-layer-item {
-      padding: 0.65rem 0.85rem;
+      padding: 0.6rem 0.75rem;
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-md);
@@ -523,19 +657,20 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
       background: rgba(99, 102, 241, 0.12);
     }
     .wall-color-preview {
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       border: 2px solid rgba(255, 255, 255, 0.2);
+      flex-shrink: 0;
     }
     .wall-name {
       display: block;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-weight: 600;
     }
     .wall-meta {
       display: block;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--text-subtle);
     }
     .btn-icon-sm {
@@ -552,7 +687,7 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
       background: rgba(239, 68, 68, 0.15);
     }
     .slider-val {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 600;
       color: #38BDF8;
     }
@@ -562,8 +697,8 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
     }
     .finish-pill {
       flex: 1;
-      padding: 0.4rem 0.2rem;
-      font-size: 0.78rem;
+      padding: 0.35rem 0.15rem;
+      font-size: 0.75rem;
       font-weight: 600;
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
@@ -584,11 +719,11 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
       background: rgba(15, 23, 42, 0.4);
       border: 1px dashed var(--border-subtle);
       border-radius: var(--radius-md);
-      padding: 0.85rem;
+      padding: 0.75rem;
     }
     .color-picker-input {
-      width: 40px;
-      height: 28px;
+      width: 36px;
+      height: 26px;
       border: none;
       background: none;
       cursor: pointer;
@@ -599,15 +734,15 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
     }
     .tab-btn {
       flex: 1;
-      padding: 0.5rem;
-      font-size: 0.85rem;
+      padding: 0.45rem;
+      font-size: 0.82rem;
       font-weight: 600;
       color: var(--text-muted);
       border-bottom: 2px solid transparent;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.4rem;
+      gap: 0.35rem;
       transition: all var(--transition-fast);
     }
     .tab-btn:hover {
@@ -619,15 +754,17 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
     }
     .brand-pills {
       display: flex;
-      gap: 0.35rem;
+      gap: 0.3rem;
+      padding-bottom: 0.2rem;
     }
     .brand-pill {
-      font-size: 0.75rem;
-      padding: 0.25rem 0.55rem;
+      font-size: 0.72rem;
+      padding: 0.2rem 0.55rem;
       border-radius: var(--radius-full);
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
       color: var(--text-muted);
+      white-space: nowrap;
     }
     .brand-pill.active {
       background: rgba(56, 189, 248, 0.15);
@@ -637,21 +774,22 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
     .swatches-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 0.65rem;
-      max-height: 260px;
+      gap: 0.5rem;
+      max-height: 280px;
       overflow-y: auto;
-      padding-right: 0.35rem;
+      padding-right: 0.25rem;
     }
     .swatch-card {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 0.6rem 0.35rem;
+      padding: 0.5rem 0.25rem;
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
       border-radius: var(--radius-md);
       transition: all var(--transition-fast);
       text-align: center;
+      cursor: pointer;
     }
     .swatch-card:hover {
       border-color: var(--border-highlight);
@@ -663,14 +801,14 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
       background: rgba(56, 189, 248, 0.08);
     }
     .swatch-color-circle {
-      width: 30px;
-      height: 30px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
-      margin-bottom: 0.4rem;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      margin-bottom: 0.35rem;
+      border: 1px solid rgba(255, 255, 255, 0.25);
     }
     .swatch-name {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 600;
       color: var(--text-main);
       white-space: nowrap;
@@ -679,18 +817,18 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
       width: 100%;
     }
     .swatch-code {
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       color: var(--text-subtle);
     }
     .patterns-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 0.75rem;
-      max-height: 300px;
+      gap: 0.65rem;
+      max-height: 280px;
       overflow-y: auto;
     }
     .pattern-card {
-      padding: 0.75rem;
+      padding: 0.65rem;
       cursor: pointer;
       text-align: center;
     }
@@ -700,31 +838,80 @@ import { WallLayer, Point2D, SampleRoom, RoomProject } from '../../models/projec
     }
     .pattern-preview {
       width: 100%;
-      height: 60px;
+      height: 55px;
       background: #FFFFFF;
       border-radius: var(--radius-sm);
       overflow: hidden;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.4rem;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .pattern-name {
       display: block;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 600;
     }
     .pattern-cat {
       display: block;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       color: var(--text-subtle);
     }
+
+    /* Responsive Layout Rules */
     @media (max-width: 1024px) {
       .studio-workspace {
         grid-template-columns: 1fr;
       }
       .studio-sidebar {
         height: auto;
+      }
+      .canvas-wrapper {
+        height: min(45vh, 400px);
+      }
+      .hidden-on-mobile {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .visualizer-page {
+        padding: 0.5rem 0.5rem 2rem;
+      }
+      .topbar-left-group {
+        flex-wrap: wrap;
+      }
+      .btn-text {
+        font-size: 0.8rem;
+      }
+      .template-select {
+        max-width: 130px;
+        font-size: 0.75rem;
+      }
+      .canvas-wrapper {
+        height: 330px;
+      }
+      .swatches-grid {
+        grid-template-columns: repeat(3, 1fr);
+        max-height: 240px;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .btn-text {
+        display: none;
+      }
+      .upload-btn i, .action-btn i {
+        margin: 0;
+      }
+      .upload-btn, .action-btn {
+        padding: 0.45rem 0.6rem;
+      }
+      .canvas-wrapper {
+        height: 290px;
+      }
+      .swatches-grid {
+        grid-template-columns: repeat(3, 1fr);
       }
     }
   `]
@@ -740,6 +927,10 @@ export class VisualizerComponent implements OnInit, AfterViewInit {
   hoverClose = false;
   draggingPointIdx = -1;
   isDrawingBrush = false;
+
+  // Mobile navigation tabs
+  mobileTab: 'colors' | 'finish' | 'walls' | 'patterns' = 'colors';
+  isMobile = false;
 
   // Visualizer Layers & Settings
   projectTitle = 'My Modern Living Room';
@@ -806,6 +997,7 @@ export class VisualizerComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+    this.checkMobile();
     this.loadCatalogs();
     this.route.queryParams.subscribe(params => {
       if (params['sampleId']) {
@@ -821,17 +1013,24 @@ export class VisualizerComponent implements OnInit, AfterViewInit {
     this.saveHistoryState();
   }
 
+  @HostListener('window:resize')
+  onResize() {
+    this.checkMobile();
+    this.setupCanvasSize();
+    this.renderCanvas();
+  }
+
+  private checkMobile() {
+    if (typeof window !== 'undefined') {
+      this.isMobile = window.innerWidth <= 1024;
+    }
+  }
+
   setupCanvasSize() {
     const canvas = this.mainCanvasRef.nativeElement;
     const wrapper = this.canvasWrapperRef.nativeElement;
     canvas.width = wrapper.clientWidth || 900;
-    canvas.height = wrapper.clientHeight || 640;
-  }
-
-  @HostListener('window:resize')
-  onResize() {
-    this.setupCanvasSize();
-    this.renderCanvas();
+    canvas.height = wrapper.clientHeight || 450;
   }
 
   loadCatalogs() {
@@ -873,7 +1072,7 @@ export class VisualizerComponent implements OnInit, AfterViewInit {
 
     this.renderCanvas();
     this.saveHistoryState();
-    this.showToast(`Loaded ${room.name} template with suggested walls`);
+    this.showToast(`Loaded ${room.name} template`);
   }
 
   onFileUpload(event: Event) {
@@ -906,7 +1105,7 @@ export class VisualizerComponent implements OnInit, AfterViewInit {
 
         this.renderCanvas();
         this.saveHistoryState();
-        this.showToast('Room photo uploaded! Click corners with the Polygon Tool to mark walls.');
+        this.showToast('Room photo uploaded! Tap wall corners to outline.');
       };
       img.src = e.target.result;
     };
@@ -953,28 +1152,28 @@ export class VisualizerComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // Canvas Mouse Interactions
-  onCanvasMouseDown(event: MouseEvent) {
+  // Unified Pointer Handler for Mouse & Touch
+  private handlePointerDown(coords: Point2D, isTouch: boolean) {
     if (this.activeTool !== 'polygon') return;
 
-    const coords = this.getCanvasNormalizedCoords(event);
     const canvas = this.mainCanvasRef.nativeElement;
     const poly = this.currentWall.polygon;
+    const hitThreshold = isTouch ? 28 : 14;
 
-    // Check if clicking existing point to drag
+    // Check if clicking/tapping existing point to drag or close
     for (let i = 0; i < poly.length; i++) {
       const px = poly[i].x * canvas.width;
       const py = poly[i].y * canvas.height;
       const ex = coords.x * canvas.width;
       const ey = coords.y * canvas.height;
-      if (Math.hypot(px - ex, py - ey) < 12) {
+      if (Math.hypot(px - ex, py - ey) < hitThreshold) {
         if (i === 0 && !this.isPolygonClosed && poly.length >= 3) {
           // Close polygon!
           this.isPolygonClosed = true;
           this.hoverClose = false;
           this.renderCanvas();
           this.saveHistoryState();
-          this.showToast('Wall selection closed! Choose your paint shade.');
+          this.showToast('Wall enclosed! Select paint color below.');
           return;
         }
         this.draggingPointIdx = i;
@@ -990,10 +1189,10 @@ export class VisualizerComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onCanvasMouseMove(event: MouseEvent) {
-    const coords = this.getCanvasNormalizedCoords(event);
+  private handlePointerMove(coords: Point2D, isTouch: boolean) {
     const canvas = this.mainCanvasRef.nativeElement;
     const poly = this.currentWall.polygon;
+    const hitThreshold = isTouch ? 28 : 15;
 
     // If dragging an existing vertex
     if (this.draggingPointIdx >= 0) {
@@ -1002,7 +1201,7 @@ export class VisualizerComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    // Check hover on first point to close
+    // Check hover/touch on first point to close
     if (!this.isPolygonClosed && poly.length >= 3) {
       const first = poly[0];
       const fx = first.x * canvas.width;
@@ -1010,7 +1209,7 @@ export class VisualizerComponent implements OnInit, AfterViewInit {
       const ex = coords.x * canvas.width;
       const ey = coords.y * canvas.height;
       const dist = Math.hypot(fx - ex, fy - ey);
-      const isNear = dist < 15;
+      const isNear = dist < hitThreshold;
       if (this.hoverClose !== isNear) {
         this.hoverClose = isNear;
         this.renderCanvas();
@@ -1018,11 +1217,26 @@ export class VisualizerComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onCanvasMouseUp(event: MouseEvent) {
+  private handlePointerUp() {
     if (this.draggingPointIdx >= 0) {
       this.draggingPointIdx = -1;
       this.saveHistoryState();
     }
+  }
+
+  // Mouse Interactions
+  onCanvasMouseDown(event: MouseEvent) {
+    const coords = this.getCanvasNormalizedCoords(event);
+    this.handlePointerDown(coords, false);
+  }
+
+  onCanvasMouseMove(event: MouseEvent) {
+    const coords = this.getCanvasNormalizedCoords(event);
+    this.handlePointerMove(coords, false);
+  }
+
+  onCanvasMouseUp(event: MouseEvent) {
+    this.handlePointerUp();
   }
 
   onCanvasMouseLeave(event: MouseEvent) {
@@ -1030,11 +1244,46 @@ export class VisualizerComponent implements OnInit, AfterViewInit {
     this.hoverClose = false;
   }
 
+  // Mobile Touch Gestures
+  onCanvasTouchStart(event: TouchEvent) {
+    if (event.cancelable) event.preventDefault();
+    if (event.touches.length === 1) {
+      const touch = event.touches[0];
+      const coords = this.getCanvasNormalizedCoordsFromTouch(touch);
+      this.handlePointerDown(coords, true);
+    }
+  }
+
+  onCanvasTouchMove(event: TouchEvent) {
+    if (event.cancelable) event.preventDefault();
+    if (event.touches.length === 1) {
+      const touch = event.touches[0];
+      const coords = this.getCanvasNormalizedCoordsFromTouch(touch);
+      this.handlePointerMove(coords, true);
+    }
+  }
+
+  onCanvasTouchEnd(event: TouchEvent) {
+    if (event.cancelable) event.preventDefault();
+    this.handlePointerUp();
+  }
+
   private getCanvasNormalizedCoords(event: MouseEvent): Point2D {
     const canvas = this.mainCanvasRef.nativeElement;
     const rect = canvas.getBoundingClientRect();
     const clientX = event.clientX - rect.left;
     const clientY = event.clientY - rect.top;
+    return {
+      x: Math.max(0, Math.min(1, clientX / rect.width)),
+      y: Math.max(0, Math.min(1, clientY / rect.height))
+    };
+  }
+
+  private getCanvasNormalizedCoordsFromTouch(touch: Touch): Point2D {
+    const canvas = this.mainCanvasRef.nativeElement;
+    const rect = canvas.getBoundingClientRect();
+    const clientX = touch.clientX - rect.left;
+    const clientY = touch.clientY - rect.top;
     return {
       x: Math.max(0, Math.min(1, clientX / rect.width)),
       y: Math.max(0, Math.min(1, clientY / rect.height))
@@ -1054,7 +1303,7 @@ export class VisualizerComponent implements OnInit, AfterViewInit {
     this.activeWallIndex = this.walls.length - 1;
     this.isPolygonClosed = false;
     this.renderCanvas();
-    this.showToast(`Created ${this.currentWall.name}. Outline its area on canvas.`);
+    this.showToast(`Created ${this.currentWall.name}. Tap corners on canvas to outline.`);
   }
 
   switchActiveWall(idx: number) {
@@ -1176,11 +1425,9 @@ export class VisualizerComponent implements OnInit, AfterViewInit {
   }
 
   openCompare() {
-    // Generate both original and painted snapshots
     const canvas = this.mainCanvasRef.nativeElement;
     const paintedData = canvas.toDataURL('image/png');
 
-    // Store in localStorage for Compare page
     localStorage.setItem('compare_painted', paintedData);
     localStorage.setItem('compare_title', this.projectTitle);
 

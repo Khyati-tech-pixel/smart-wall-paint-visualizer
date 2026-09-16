@@ -21,7 +21,7 @@ import { RouterLink } from '@angular/router';
             <p class="brand-desc">
               Next-generation interior room paint and design preview platform. Transforming real-world room photos with authentic lighting-preserved paint shades, wallpaper textures, and dual-tone walls.
             </p>
-            <div class="tech-stack flex items-center gap-2 mt-4">
+            <div class="tech-stack flex items-center gap-2 mt-3 flex-wrap">
               <span class="badge badge-primary">Angular 20</span>
               <span class="badge badge-success">Node & Express</span>
               <span class="badge badge-warning">MongoDB</span>
@@ -45,9 +45,9 @@ import { RouterLink } from '@angular/router';
           <div class="footer-disclaimer">
             <h4 class="footer-heading">Color Standards</h4>
             <p class="disclaimer-text">
-              Color collections inspired by leading international paint systems including Behr®, Asian Paints®, and Dulux®. Simulated results account for lighting and wall depth. Final on-site appearance may vary depending on natural room illumination and surface texture.
+              Color collections inspired by leading international paint systems including Behr®, Asian Paints®, and Dulux®. Simulated results account for lighting and wall depth.
             </p>
-            <div class="brand-tags flex items-center gap-2 mt-3">
+            <div class="brand-tags flex items-center gap-2 mt-3 flex-wrap">
               <span class="brand-chip">Behr Reference</span>
               <span class="brand-chip">Asian Paints</span>
               <span class="brand-chip">Dulux Color</span>
@@ -56,13 +56,14 @@ import { RouterLink } from '@angular/router';
           </div>
         </div>
 
-        <div class="footer-bottom flex items-center justify-between mt-8 pt-6">
+        <div class="footer-bottom flex items-center justify-between mt-6 pt-5">
           <p class="copyright">
-            © 2026 Smart Wall Paint Visualizer. MEAN Stack Virtual Room Paint & Design Preview Application.
+            © 2026 Smart Wall Paint Visualizer. MEAN Stack Virtual Room Paint & Design Preview.
           </p>
-          <div class="flex items-center gap-4">
-            <a routerLink="/admin" class="footer-bottom-link">Admin Dashboard</a>
-            <a routerLink="/auth" class="footer-bottom-link">Account Access</a>
+          <div class="footer-bottom-links flex items-center gap-3">
+            <a routerLink="/admin" class="footer-bottom-link">Admin</a>
+            <span class="text-subtle">•</span>
+            <a routerLink="/auth" class="footer-bottom-link">Account</a>
           </div>
         </div>
       </div>
@@ -72,13 +73,13 @@ import { RouterLink } from '@angular/router';
     .site-footer {
       background: var(--bg-surface);
       border-top: 1px solid var(--border-subtle);
-      padding: 4rem 0 2rem;
-      margin-top: 5rem;
+      padding: 3.5rem 0 2rem;
+      margin-top: 4rem;
     }
     .footer-grid {
       display: grid;
       grid-template-columns: 1.5fr 1fr 1.3fr;
-      gap: 3rem;
+      gap: 2.5rem;
     }
     .logo-icon-sm {
       width: 32px;
@@ -90,6 +91,7 @@ import { RouterLink } from '@angular/router';
       justify-content: center;
       color: #FFFFFF;
       font-size: 1rem;
+      flex-shrink: 0;
     }
     .brand-title {
       font-family: var(--font-heading);
@@ -97,24 +99,24 @@ import { RouterLink } from '@angular/router';
       font-weight: 700;
     }
     .brand-desc {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       color: var(--text-muted);
       line-height: 1.6;
     }
     .footer-heading {
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: 600;
-      margin-bottom: 1.25rem;
+      margin-bottom: 1rem;
       color: var(--text-main);
     }
     .footer-links ul {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 0.65rem;
+      gap: 0.6rem;
     }
     .footer-links a {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       color: var(--text-muted);
       transition: color var(--transition-fast);
     }
@@ -122,15 +124,15 @@ import { RouterLink } from '@angular/router';
       color: var(--accent-secondary);
     }
     .disclaimer-text {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
-      line-height: 1.6;
+      line-height: 1.55;
     }
     .brand-chip {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
-      padding: 0.2rem 0.55rem;
+      padding: 0.2rem 0.5rem;
       border-radius: var(--radius-sm);
       color: var(--text-subtle);
     }
@@ -138,11 +140,11 @@ import { RouterLink } from '@angular/router';
       border-top: 1px solid var(--border-subtle);
     }
     .copyright {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: var(--text-subtle);
     }
     .footer-bottom-link {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
       transition: color var(--transition-fast);
     }
@@ -150,13 +152,17 @@ import { RouterLink } from '@angular/router';
       color: var(--text-main);
     }
     @media (max-width: 900px) {
+      .site-footer {
+        padding: 2.5rem 0 calc(2rem + var(--safe-bottom));
+        margin-top: 2.5rem;
+      }
       .footer-grid {
         grid-template-columns: 1fr;
-        gap: 2rem;
+        gap: 1.75rem;
       }
       .footer-bottom {
         flex-direction: column;
-        gap: 1rem;
+        gap: 0.75rem;
         text-align: center;
       }
     }

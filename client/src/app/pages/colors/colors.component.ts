@@ -14,7 +14,7 @@ import { WallpaperPattern } from '../../models/pattern.model';
   template: `
     <div class="colors-page container">
       <!-- Top Title & Navigation Tabs -->
-      <div class="page-header flex items-center justify-between mb-6">
+      <div class="page-header flex items-center justify-between mb-5">
         <div>
           <span class="badge badge-primary">Color Library</span>
           <h1 class="page-title mt-1">Curated Shades & Wallpapers</h1>
@@ -28,7 +28,7 @@ import { WallpaperPattern } from '../../models/pattern.model';
             [class.active]="activeTab === 'colors'"
           >
             <i class="fa-solid fa-palette"></i>
-            <span>Paint Colors ({{ colors.length }})</span>
+            <span>Shades ({{ colors.length }})</span>
           </button>
           <button 
             (click)="activeTab = 'patterns'" 
@@ -44,15 +44,15 @@ import { WallpaperPattern } from '../../models/pattern.model';
       <!-- TAB 1: PAINT COLORS -->
       <div *ngIf="activeTab === 'colors'" class="tab-content animate-fade">
         <!-- Search, Brand & Category Filter Bar -->
-        <div class="filter-bar card mb-6 flex items-center justify-between">
-          <div class="flex items-center gap-3 flex-1">
-            <!-- Search -->
+        <div class="filter-bar card mb-5 flex items-center justify-between gap-3">
+          <div class="filter-inputs-group flex items-center gap-2 flex-1">
+            <!-- Search Box -->
             <div class="search-box flex-1">
               <i class="fa-solid fa-magnifying-glass search-icon"></i>
               <input 
                 [(ngModel)]="searchQuery" 
                 (input)="applyFilters()" 
-                placeholder="Search shades by name, code (e.g. BL-201), or hex (#1E3A5F)..."
+                placeholder="Search name, code (BL-201), or hex..."
                 class="form-input search-field"
               >
             </div>
@@ -64,8 +64,8 @@ import { WallpaperPattern } from '../../models/pattern.model';
             </select>
           </div>
 
-          <!-- Brand Pills -->
-          <div class="brand-pills flex items-center gap-1 ml-4">
+          <!-- Brand Pills (Swipeable on Mobile) -->
+          <div class="brand-pills flex items-center gap-1 touch-scroll-x">
             <button 
               *ngFor="let b of ['All', 'Behr', 'Asian Paints', 'Dulux']" 
               (click)="selectedBrand = b; applyFilters()"
@@ -106,16 +106,16 @@ import { WallpaperPattern } from '../../models/pattern.model';
                   <span>{{ color.hex }}</span>
                   <i class="fa-regular fa-copy"></i>
                 </button>
-                <span class="rgb-text">RGB: {{ color.rgb }}</span>
+                <span class="rgb-text hidden-xs">RGB: {{ color.rgb }}</span>
               </div>
 
               <!-- Tags -->
-              <div class="room-tags flex items-center gap-1 mt-3">
+              <div class="room-tags flex items-center gap-1 mt-2">
                 <span *ngFor="let tag of color.tags?.slice(0, 2)" class="room-tag">{{ tag }}</span>
               </div>
 
               <!-- Try in Studio CTA Button -->
-              <button (click)="tryInStudio(color)" class="btn btn-primary btn-sm mt-4 w-full">
+              <button (click)="tryInStudio(color)" class="btn btn-primary btn-sm mt-3 w-full">
                 <i class="fa-solid fa-wand-magic-sparkles"></i>
                 <span>Try in Studio</span>
               </button>
@@ -133,7 +133,7 @@ import { WallpaperPattern } from '../../models/pattern.model';
               <span class="badge badge-neutral mb-1">{{ p.category }}</span>
               <h3 class="pattern-title">{{ p.name }}</h3>
               <p class="pattern-desc">{{ p.description }}</p>
-              <div class="pattern-meta flex items-center justify-between mt-3">
+              <div class="pattern-meta flex items-center justify-between mt-2">
                 <span class="text-xs text-subtle">Style: {{ p.style }}</span>
                 <span class="text-xs text-subtle">Scale: {{ p.scale }}px</span>
               </div>
@@ -155,14 +155,14 @@ import { WallpaperPattern } from '../../models/pattern.model';
   `,
   styles: [`
     .colors-page {
-      padding: 2rem 1.5rem 5rem;
+      padding: 1.5rem 1.5rem 5rem;
     }
     .page-title {
       font-size: 2.2rem;
       font-weight: 800;
     }
     .page-subtitle {
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       color: var(--text-muted);
     }
     .tabs-pill {
@@ -174,13 +174,14 @@ import { WallpaperPattern } from '../../models/pattern.model';
     .tab-btn {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1.1rem;
-      font-size: 0.88rem;
+      gap: 0.4rem;
+      padding: 0.45rem 1rem;
+      font-size: 0.85rem;
       font-weight: 600;
       color: var(--text-muted);
       border-radius: var(--radius-full);
       transition: all var(--transition-fast);
+      white-space: nowrap;
     }
     .tab-btn.active {
       background: var(--accent-primary);
@@ -188,34 +189,43 @@ import { WallpaperPattern } from '../../models/pattern.model';
       box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
     }
     .filter-bar {
-      padding: 0.85rem 1.25rem;
+      padding: 0.75rem 1rem;
     }
     .search-box {
       position: relative;
     }
     .search-icon {
       position: absolute;
-      left: 1rem;
+      left: 0.85rem;
       top: 50%;
       transform: translateY(-50%);
       color: var(--text-subtle);
+      font-size: 0.85rem;
     }
     .search-field {
-      padding-left: 2.5rem;
+      padding-left: 2.3rem;
       width: 100%;
+      font-size: 0.88rem;
     }
     .select-w {
-      min-width: 180px;
+      min-width: 170px;
+      font-size: 0.88rem;
+    }
+    .brand-pills {
+      display: flex;
+      gap: 0.35rem;
+      padding-bottom: 0.15rem;
     }
     .brand-pill-btn {
-      padding: 0.35rem 0.85rem;
-      font-size: 0.82rem;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.8rem;
       font-weight: 600;
       border-radius: var(--radius-full);
       background: var(--bg-card-hover);
       color: var(--text-muted);
       border: 1px solid var(--border-subtle);
       transition: all var(--transition-fast);
+      white-space: nowrap;
     }
     .brand-pill-btn.active {
       background: rgba(56, 189, 248, 0.18);
@@ -225,7 +235,7 @@ import { WallpaperPattern } from '../../models/pattern.model';
     .colors-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 1.5rem;
+      gap: 1.25rem;
     }
     .color-card {
       padding: 0;
@@ -234,70 +244,74 @@ import { WallpaperPattern } from '../../models/pattern.model';
       flex-direction: column;
     }
     .swatch-tile {
-      height: 140px;
+      height: 130px;
       position: relative;
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
     .fav-btn {
       position: absolute;
-      top: 0.75rem;
-      right: 0.75rem;
-      width: 32px;
-      height: 32px;
+      top: 0.65rem;
+      right: 0.65rem;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(0, 0, 0, 0.45);
       backdrop-filter: blur(6px);
       color: #FFFFFF;
       display: flex;
       align-items: center;
       justify-content: center;
       transition: all var(--transition-fast);
+      font-size: 0.95rem;
     }
     .fav-btn.favorited {
       color: #EC4899;
     }
     .popular-tag {
       position: absolute;
-      bottom: 0.75rem;
-      left: 0.75rem;
+      bottom: 0.65rem;
+      left: 0.65rem;
       background: rgba(15, 23, 42, 0.85);
       border: 1px solid rgba(255, 255, 255, 0.15);
-      padding: 0.2rem 0.6rem;
+      padding: 0.15rem 0.55rem;
       border-radius: var(--radius-full);
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 700;
       text-transform: uppercase;
       color: #FBBF24;
     }
     .card-body {
-      padding: 1.25rem;
+      padding: 1rem;
       flex: 1;
       display: flex;
       flex-direction: column;
     }
     .color-brand {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 600;
       color: #38BDF8;
       text-transform: uppercase;
     }
     .color-code {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--text-subtle);
     }
     .color-name {
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .hex-badge {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.35rem;
       background: var(--bg-card);
       border: 1px solid var(--border-subtle);
-      padding: 0.2rem 0.5rem;
+      padding: 0.2rem 0.45rem;
       border-radius: 4px;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--text-main);
       transition: all var(--transition-fast);
     }
@@ -305,16 +319,16 @@ import { WallpaperPattern } from '../../models/pattern.model';
       border-color: var(--accent-primary);
     }
     .rgb-text {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: var(--text-subtle);
     }
     .room-tags {
       flex-wrap: wrap;
     }
     .room-tag {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       background: rgba(255, 255, 255, 0.05);
-      padding: 0.15rem 0.45rem;
+      padding: 0.12rem 0.4rem;
       border-radius: 4px;
       color: var(--text-subtle);
     }
@@ -324,14 +338,14 @@ import { WallpaperPattern } from '../../models/pattern.model';
     .patterns-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
+      gap: 1.25rem;
     }
     .pattern-item {
       padding: 0;
       overflow: hidden;
     }
     .pattern-display {
-      height: 160px;
+      height: 150px;
       background: #FFFFFF;
       display: flex;
       align-items: center;
@@ -339,45 +353,57 @@ import { WallpaperPattern } from '../../models/pattern.model';
       overflow: hidden;
     }
     .pattern-body {
-      padding: 1.25rem;
+      padding: 1rem;
     }
     .pattern-title {
-      font-size: 1.1rem;
-      margin-bottom: 0.35rem;
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
     }
     .pattern-desc {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
-      line-height: 1.5;
+      line-height: 1.45;
     }
     .toast-feedback {
       position: fixed;
-      bottom: 2rem;
-      right: 2rem;
+      bottom: calc(75px + var(--safe-bottom));
+      right: 1.5rem;
       background: #10B981;
       color: #FFFFFF;
-      padding: 0.7rem 1.4rem;
+      padding: 0.65rem 1.25rem;
       border-radius: var(--radius-full);
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.45rem;
       box-shadow: var(--shadow-lg);
       z-index: 999;
     }
 
-    @media (max-width: 1200px) {
+    @media (max-width: 1100px) {
       .colors-grid { grid-template-columns: repeat(3, 1fr); }
       .patterns-grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 800px) {
-      .colors-grid { grid-template-columns: repeat(2, 1fr); }
+      .page-header { flex-direction: column; align-items: flex-start; gap: 0.85rem; }
+      .tabs-pill { width: 100%; justify-content: space-around; }
+      .tabs-pill .tab-btn { flex: 1; justify-content: center; }
+      .filter-bar { flex-direction: column; align-items: stretch; gap: 0.75rem; }
+      .filter-inputs-group { flex-direction: column; }
+      .select-w { width: 100%; }
+      .colors-grid { grid-template-columns: repeat(2, 1fr); gap: 0.85rem; }
       .patterns-grid { grid-template-columns: 1fr; }
-      .filter-bar { flex-direction: column; align-items: stretch; gap: 1rem; }
     }
-    @media (max-width: 500px) {
-      .colors-grid { grid-template-columns: 1fr; }
+    @media (max-width: 480px) {
+      .colors-page { padding: 1rem 0.75rem 4rem; }
+      .page-title { font-size: 1.6rem; }
+      .colors-grid { grid-template-columns: repeat(2, 1fr); gap: 0.65rem; }
+      .swatch-tile { height: 105px; }
+      .card-body { padding: 0.75rem; }
+      .color-name { font-size: 0.88rem; }
+      .hidden-xs { display: none; }
+      .toast-feedback { right: 1rem; left: 1rem; justify-content: center; }
     }
   `]
 })
@@ -392,6 +418,7 @@ export class ColorsComponent implements OnInit {
   selectedCategory = 'All';
   selectedBrand = 'All';
   toastMsg = '';
+  favoriteCodes: Set<string> = new Set();
 
   constructor(
     private paintService: PaintService,
@@ -400,19 +427,47 @@ export class ColorsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.loadData();
+    this.loadFavorites();
+    this.loadColors();
+    this.loadPatterns();
   }
 
-  loadData() {
-    this.paintService.getColors().subscribe(colors => {
-      this.colors = colors;
-      this.filteredColors = colors;
-      this.categories = Array.from(new Set(colors.map(c => c.category))).sort();
+  loadColors() {
+    this.paintService.getColors().subscribe(c => {
+      this.colors = c;
+      this.filteredColors = c;
+      this.categories = Array.from(new Set(c.map(item => item.category))).sort();
     });
+  }
 
-    this.paintService.getPatterns().subscribe(patterns => {
-      this.patterns = patterns;
+  loadPatterns() {
+    this.paintService.getPatterns().subscribe(p => {
+      this.patterns = p;
     });
+  }
+
+  loadFavorites() {
+    const favs = localStorage.getItem('fav_colors');
+    if (favs) {
+      try {
+        this.favoriteCodes = new Set(JSON.parse(favs));
+      } catch (e) {}
+    }
+  }
+
+  toggleFavorite(code: string) {
+    if (this.favoriteCodes.has(code)) {
+      this.favoriteCodes.delete(code);
+      this.showToast('Removed from favorites');
+    } else {
+      this.favoriteCodes.add(code);
+      this.showToast('Saved to favorites');
+    }
+    localStorage.setItem('fav_colors', JSON.stringify(Array.from(this.favoriteCodes)));
+  }
+
+  isFavorited(code: string): boolean {
+    return this.favoriteCodes.has(code);
   }
 
   applyFilters() {
@@ -435,27 +490,13 @@ export class ColorsComponent implements OnInit {
   }
 
   copyHex(hex: string) {
-    navigator.clipboard.writeText(hex);
-    this.showToast(`Copied ${hex} to clipboard!`);
-  }
-
-  isFavorited(code: string): boolean {
-    const u = this.authService.currentUser();
-    return !!u && !!u.favoriteColors && u.favoriteColors.includes(code);
-  }
-
-  toggleFavorite(code: string) {
-    if (!this.authService.isLoggedIn) {
-      this.showToast('Please sign in to save your favorite shades!');
-      return;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(hex);
+      this.showToast(`Copied ${hex} to clipboard!`);
     }
-    this.authService.toggleFavorite(code).subscribe(() => {
-      this.showToast('Favorites updated');
-    });
   }
 
   tryInStudio(color: PaintColor) {
-    // Navigate to visualizer studio
     this.router.navigate(['/visualizer']);
   }
 

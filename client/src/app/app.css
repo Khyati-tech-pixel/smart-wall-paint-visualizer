@@ -7,3 +7,10 @@
 .main-content {
   flex: 1;
 }
+
+@media (max-width: 900px) {
+  .main-content {
+    padding-bottom: calc(65px + var(--safe-bottom));
+  }
+}
+

@@ -11,13 +11,13 @@ import { CanvasService } from '../../services/canvas.service';
     <div class="compare-page container">
       <!-- Top Header -->
       <div class="compare-header flex items-center justify-between mb-4">
-        <div>
+        <div class="header-left">
           <span class="badge badge-primary">Comparison Mode</span>
           <h1 class="compare-title mt-1">{{ projectTitle }}</h1>
-          <p class="compare-subtitle">Drag the interactive slider to inspect the painted transformation in real room lighting.</p>
+          <p class="compare-subtitle">Drag the interactive slider or switch views to inspect the virtual paint transformation.</p>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="header-actions-bar flex items-center gap-2 flex-wrap">
           <!-- View Mode Toggle -->
           <div class="toggle-group flex items-center">
             <button 
@@ -38,14 +38,14 @@ import { CanvasService } from '../../services/canvas.service';
             </button>
           </div>
 
-          <button (click)="downloadComparison()" class="btn btn-secondary btn-sm">
+          <button (click)="downloadComparison()" class="btn btn-secondary btn-sm" title="Download side-by-side image">
             <i class="fa-solid fa-download"></i>
-            <span>Export Comparison</span>
+            <span>Export</span>
           </button>
 
           <a routerLink="/visualizer" class="btn btn-primary btn-sm">
             <i class="fa-solid fa-paintbrush"></i>
-            <span>Back to Studio</span>
+            <span>Studio</span>
           </a>
         </div>
       </div>
@@ -56,6 +56,7 @@ import { CanvasService } from '../../services/canvas.service';
           class="slider-viewport" 
           #viewportRef 
           (mousemove)="onMouseMove($event)"
+          (touchstart)="onTouchStart($event)"
           (touchmove)="onTouchMove($event)"
           (mousedown)="isDragging = true"
           (mouseup)="isDragging = false"
@@ -77,16 +78,16 @@ import { CanvasService } from '../../services/canvas.service';
 
           <!-- Labels -->
           <div class="badge-label badge-before">
-            <span>ORIGINAL ROOM</span>
+            <span>ORIGINAL</span>
           </div>
           <div class="badge-label badge-after">
-            <span>VIRTUAL PAINT PREVIEW</span>
+            <span>VIRTUAL PAINT</span>
           </div>
         </div>
 
         <div class="slider-hint text-center mt-3">
           <span class="text-subtle text-xs">
-            <i class="fa-solid fa-arrows-left-right"></i> Click or drag anywhere across the room to move the before/after curtain
+            <i class="fa-solid fa-arrows-left-right"></i> Drag the divider handle or swipe horizontally to reveal Before / After
           </span>
         </div>
       </div>
@@ -114,14 +115,14 @@ import { CanvasService } from '../../services/canvas.service';
   `,
   styles: [`
     .compare-page {
-      padding: 2rem 1.5rem 4rem;
+      padding: 1.5rem 1.5rem 4rem;
     }
     .compare-title {
       font-size: 2rem;
       font-weight: 800;
     }
     .compare-subtitle {
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       color: var(--text-muted);
     }
     .toggle-group {
@@ -133,36 +134,39 @@ import { CanvasService } from '../../services/canvas.service';
     .toggle-btn {
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      padding: 0.4rem 0.85rem;
-      font-size: 0.85rem;
+      gap: 0.35rem;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.82rem;
       font-weight: 600;
       color: var(--text-muted);
       border-radius: var(--radius-sm);
       transition: all var(--transition-fast);
+      white-space: nowrap;
     }
     .toggle-btn.active {
       background: var(--accent-primary);
       color: #FFFFFF;
     }
     .split-slider-card {
-      padding: 1rem;
+      padding: 0.75rem;
     }
     .slider-viewport {
       position: relative;
       width: 100%;
-      height: 600px;
+      height: 560px;
       border-radius: var(--radius-md);
       overflow: hidden;
       cursor: ew-resize;
       background: #000000;
       user-select: none;
+      touch-action: none;
     }
     .base-canvas, .overlay-canvas {
       width: 100%;
       height: 100%;
       object-fit: contain;
       display: block;
+      touch-action: none;
     }
     .painted-overlay {
       position: absolute;
@@ -197,23 +201,23 @@ import { CanvasService } from '../../services/canvas.service';
     }
     .badge-label {
       position: absolute;
-      top: 1.25rem;
-      padding: 0.4rem 0.85rem;
+      top: 1rem;
+      padding: 0.35rem 0.75rem;
       border-radius: var(--radius-full);
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0.06em;
       pointer-events: none;
       backdrop-filter: blur(8px);
     }
     .badge-before {
-      left: 1.25rem;
-      background: rgba(15, 23, 42, 0.8);
+      left: 1rem;
+      background: rgba(15, 23, 42, 0.85);
       color: #94A3B8;
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .badge-after {
-      right: 1.25rem;
+      right: 1rem;
       background: rgba(16, 185, 129, 0.85);
       color: #FFFFFF;
       border: 1px solid rgba(255, 255, 255, 0.2);
@@ -221,10 +225,10 @@ import { CanvasService } from '../../services/canvas.service';
     .side-by-side-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
+      gap: 1.25rem;
     }
     .compare-box {
-      padding: 1rem;
+      padding: 0.85rem;
     }
     .side-canvas {
       width: 100%;
@@ -232,10 +236,20 @@ import { CanvasService } from '../../services/canvas.service';
       border-radius: var(--radius-sm);
       display: block;
     }
+
     @media (max-width: 900px) {
-      .compare-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+      .compare-page { padding: 1rem 0.75rem 3rem; }
+      .compare-header { flex-direction: column; align-items: stretch; gap: 0.85rem; }
+      .header-actions-bar { justify-content: space-between; }
+      .header-actions-bar .toggle-group { flex: 1; justify-content: space-around; }
       .side-by-side-grid { grid-template-columns: 1fr; }
-      .slider-viewport { height: 420px; }
+      .slider-viewport { height: 350px; }
+      .compare-title { font-size: 1.5rem; }
+    }
+    @media (max-width: 480px) {
+      .slider-viewport { height: 290px; }
+      .divider-knob { width: 38px; height: 38px; font-size: 0.95rem; }
+      .badge-label { font-size: 0.65rem; padding: 0.25rem 0.5rem; }
     }
   `]
 })
@@ -249,7 +263,7 @@ export class CompareComponent implements OnInit, AfterViewInit {
 
   projectTitle = 'Living Room Transformation';
   roomType = 'Living Room';
-  sliderPos = 50; // percentage (0 to 100)
+  sliderPos = 50;
   isDragging = false;
   viewMode: 'slider' | 'side-by-side' = 'slider';
 
@@ -292,7 +306,6 @@ export class CompareComponent implements OnInit, AfterViewInit {
       };
       img.src = storedPaintedData;
     } else {
-      // Fallback: draw sample room + demo paint
       this.canvasService.drawSampleRoom(ctxPainted, painted.width, painted.height, this.roomType);
       const wallLayer = {
         name: 'Accent Wall',
@@ -303,7 +316,7 @@ export class CompareComponent implements OnInit, AfterViewInit {
           { x: 0.15, y: 0.72 }
         ],
         color: { code: 'BL-201', name: 'Pacific Navy', hex: '#1E3A5F' },
-        finish: 'matte',
+        finish: 'matte' as const,
         opacity: 0.86
       };
       this.canvasService.applyWallColor(ctxPainted, wallLayer, painted.width, painted.height);
@@ -314,7 +327,15 @@ export class CompareComponent implements OnInit, AfterViewInit {
     this.updateSlider(event.clientX);
   }
 
+  onTouchStart(event: TouchEvent) {
+    if (event.cancelable) event.preventDefault();
+    if (event.touches.length > 0) {
+      this.updateSlider(event.touches[0].clientX);
+    }
+  }
+
   onTouchMove(event: TouchEvent) {
+    if (event.cancelable) event.preventDefault();
     if (event.touches.length > 0) {
       this.updateSlider(event.touches[0].clientX);
     }

@@ -13,7 +13,7 @@ import { WallpaperPattern } from '../../models/pattern.model';
   template: `
     <div class="admin-page container">
       <!-- Admin Top Header -->
-      <div class="page-header flex items-center justify-between mb-6">
+      <div class="page-header flex items-center justify-between mb-5">
         <div>
           <div class="flex items-center gap-2">
             <span class="badge badge-warning">Administrator Portal</span>
@@ -23,10 +23,10 @@ import { WallpaperPattern } from '../../models/pattern.model';
           <p class="page-subtitle">Monitor visualizer platform engagement, manage paint color shade catalogs, and configure patterns.</p>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="header-btns flex items-center gap-2 flex-wrap">
           <button (click)="openAddColorModal = true" class="btn btn-primary">
             <i class="fa-solid fa-plus"></i>
-            <span>Add New Paint Shade</span>
+            <span>Add Paint Shade</span>
           </button>
           <button (click)="loadStats()" class="btn btn-secondary" title="Refresh metrics">
             <i class="fa-solid fa-rotate"></i>
@@ -35,87 +35,89 @@ import { WallpaperPattern } from '../../models/pattern.model';
       </div>
 
       <!-- KPI METRIC CARDS -->
-      <div class="kpi-grid mb-8">
+      <div class="kpi-grid mb-6">
         <div class="kpi-card card">
           <div class="kpi-header flex items-center justify-between">
-            <span class="kpi-title">Room Photo Uploads</span>
+            <span class="kpi-title">Uploads</span>
             <div class="kpi-icon" style="background: rgba(59, 130, 246, 0.15); color: #3B82F6">
               <i class="fa-solid fa-cloud-arrow-up"></i>
             </div>
           </div>
           <div class="kpi-value">{{ stats?.kpis?.totalUploads || 45 }}</div>
-          <span class="kpi-trend text-success"><i class="fa-solid fa-arrow-trend-up"></i> +18% this week</span>
+          <span class="kpi-trend text-success"><i class="fa-solid fa-arrow-trend-up"></i> +18%</span>
         </div>
 
         <div class="kpi-card card">
           <div class="kpi-header flex items-center justify-between">
-            <span class="kpi-title">Saved Room Designs</span>
+            <span class="kpi-title">Saved Designs</span>
             <div class="kpi-icon" style="background: rgba(16, 185, 129, 0.15); color: #10B981">
               <i class="fa-solid fa-folder-open"></i>
             </div>
           </div>
           <div class="kpi-value">{{ stats?.kpis?.totalProjects || 12 }}</div>
-          <span class="kpi-trend text-success"><i class="fa-solid fa-arrow-trend-up"></i> +24% conversion</span>
+          <span class="kpi-trend text-success"><i class="fa-solid fa-arrow-trend-up"></i> +24%</span>
         </div>
 
         <div class="kpi-card card">
           <div class="kpi-header flex items-center justify-between">
-            <span class="kpi-title">Registered Accounts</span>
+            <span class="kpi-title">Users</span>
             <div class="kpi-icon" style="background: rgba(139, 92, 246, 0.15); color: #8B5CF6">
               <i class="fa-solid fa-users"></i>
             </div>
           </div>
           <div class="kpi-value">{{ stats?.kpis?.totalUsers || 28 }}</div>
-          <span class="kpi-subtext">Active interior designers & users</span>
+          <span class="kpi-subtext">Active accounts</span>
         </div>
 
         <div class="kpi-card card">
           <div class="kpi-header flex items-center justify-between">
-            <span class="kpi-title">Catalog Shades</span>
+            <span class="kpi-title">Shades</span>
             <div class="kpi-icon" style="background: rgba(236, 72, 153, 0.15); color: #EC4899">
               <i class="fa-solid fa-swatchbook"></i>
             </div>
           </div>
           <div class="kpi-value">{{ stats?.kpis?.totalColors || colors.length }}</div>
-          <span class="kpi-subtext">Across 7 color families</span>
+          <span class="kpi-subtext">Catalog shades</span>
         </div>
       </div>
 
-      <!-- MAIN MANAGEMENT TABS -->
-      <div class="admin-tabs flex items-center gap-2 mb-6">
-        <button 
-          (click)="activeTab = 'shades'" 
-          class="admin-tab-btn" 
-          [class.active]="activeTab === 'shades'"
-        >
-          <i class="fa-solid fa-palette"></i>
-          <span>Paint Shades Catalog ({{ colors.length }})</span>
-        </button>
-        <button 
-          (click)="activeTab = 'patterns'" 
-          class="admin-tab-btn" 
-          [class.active]="activeTab === 'patterns'"
-        >
-          <i class="fa-solid fa-border-all"></i>
-          <span>Wallpaper Textures ({{ patterns.length }})</span>
-        </button>
-        <button 
-          (click)="activeTab = 'activity'" 
-          class="admin-tab-btn" 
-          [class.active]="activeTab === 'activity'"
-        >
-          <i class="fa-solid fa-list-check"></i>
-          <span>User Activity Log</span>
-        </button>
+      <!-- MAIN MANAGEMENT TABS (Scrollable on Mobile) -->
+      <div class="admin-tabs-wrapper touch-scroll-x mb-5">
+        <div class="admin-tabs flex items-center gap-1">
+          <button 
+            (click)="activeTab = 'shades'" 
+            class="admin-tab-btn" 
+            [class.active]="activeTab === 'shades'"
+          >
+            <i class="fa-solid fa-palette"></i>
+            <span>Shades ({{ colors.length }})</span>
+          </button>
+          <button 
+            (click)="activeTab = 'patterns'" 
+            class="admin-tab-btn" 
+            [class.active]="activeTab === 'patterns'"
+          >
+            <i class="fa-solid fa-border-all"></i>
+            <span>Wallpapers ({{ patterns.length }})</span>
+          </button>
+          <button 
+            (click)="activeTab = 'activity'" 
+            class="admin-tab-btn" 
+            [class.active]="activeTab === 'activity'"
+          >
+            <i class="fa-solid fa-list-check"></i>
+            <span>Activity Log</span>
+          </button>
+        </div>
       </div>
 
       <!-- TAB 1: Paint Shades Manager -->
       <div *ngIf="activeTab === 'shades'" class="tab-pane card">
-        <div class="table-header flex items-center justify-between mb-4">
-          <div class="flex items-center gap-3">
+        <div class="table-header flex items-center justify-between mb-4 flex-wrap gap-2">
+          <div class="flex items-center gap-2 flex-1 search-wrapper">
             <input 
               [(ngModel)]="searchColorQuery" 
-              placeholder="Filter shades by name or code..." 
+              placeholder="Filter shades by name, code, hex..." 
               class="form-input search-input"
             >
           </div>
@@ -131,9 +133,9 @@ import { WallpaperPattern } from '../../models/pattern.model';
                 <th>Shade Name</th>
                 <th>Brand</th>
                 <th>Category</th>
-                <th>HEX / RGB</th>
+                <th>HEX</th>
                 <th>Popular</th>
-                <th>Actions</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -198,7 +200,7 @@ import { WallpaperPattern } from '../../models/pattern.model';
         </div>
       </div>
 
-      <!-- ADD NEW COLOR MODAL -->
+      <!-- ADD NEW COLOR MODAL (Mobile-Friendly Dialog) -->
       <div *ngIf="openAddColorModal" class="modal-backdrop flex items-center justify-center animate-fade">
         <div class="modal-card glass-panel">
           <div class="modal-header flex items-center justify-between mb-4">
@@ -212,7 +214,7 @@ import { WallpaperPattern } from '../../models/pattern.model';
               <input [(ngModel)]="newColor.name" placeholder="e.g. Aegean Breeze" class="form-input">
             </div>
 
-            <div class="grid-2 gap-3">
+            <div class="modal-grid-2 gap-3">
               <div class="form-group">
                 <label class="form-label">Shade Code</label>
                 <input [(ngModel)]="newColor.code" placeholder="e.g. BL-205" class="form-input">
@@ -227,7 +229,7 @@ import { WallpaperPattern } from '../../models/pattern.model';
               </div>
             </div>
 
-            <div class="grid-2 gap-3">
+            <div class="modal-grid-2 gap-3">
               <div class="form-group">
                 <label class="form-label">Brand</label>
                 <select [(ngModel)]="newColor.brand" class="form-select">
@@ -251,15 +253,15 @@ import { WallpaperPattern } from '../../models/pattern.model';
               </div>
             </div>
 
-            <label class="flex items-center gap-2 cursor-pointer mt-2">
+            <label class="flex items-center gap-2 cursor-pointer mt-1">
               <input type="checkbox" [(ngModel)]="newColor.popular">
               <span class="form-label m-0">Mark as Trending / Popular</span>
             </label>
           </div>
 
-          <div class="modal-footer flex items-center justify-between mt-6 pt-4">
+          <div class="modal-footer flex items-center justify-between mt-5 pt-3">
             <button (click)="openAddColorModal = false" class="btn btn-secondary">Cancel</button>
-            <button (click)="submitNewColor()" class="btn btn-primary">Save Paint Shade</button>
+            <button (click)="submitNewColor()" class="btn btn-primary">Save Shade</button>
           </div>
         </div>
       </div>
@@ -273,55 +275,58 @@ import { WallpaperPattern } from '../../models/pattern.model';
   `,
   styles: [`
     .admin-page {
-      padding: 2rem 1.5rem 5rem;
+      padding: 1.5rem 1.5rem 5rem;
     }
     .page-title {
       font-size: 2.2rem;
       font-weight: 800;
     }
     .page-subtitle {
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       color: var(--text-muted);
     }
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 1.5rem;
+      gap: 1.25rem;
     }
     .kpi-card {
-      padding: 1.5rem;
+      padding: 1.25rem;
     }
     .kpi-title {
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 600;
       color: var(--text-muted);
     }
     .kpi-icon {
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
     .kpi-value {
       font-family: var(--font-heading);
-      font-size: 2.2rem;
+      font-size: 2rem;
       font-weight: 800;
-      margin: 0.75rem 0 0.25rem;
+      margin: 0.5rem 0 0.2rem;
     }
     .kpi-trend {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 600;
     }
     .kpi-subtext {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--text-subtle);
+    }
+    .admin-tabs-wrapper {
+      padding-bottom: 0.25rem;
     }
     .admin-tabs {
       background: var(--bg-card);
-      padding: 0.35rem;
+      padding: 0.3rem;
       border-radius: var(--radius-md);
       border: 1px solid var(--border-subtle);
       width: fit-content;
@@ -329,58 +334,63 @@ import { WallpaperPattern } from '../../models/pattern.model';
     .admin-tab-btn {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1.1rem;
-      font-size: 0.88rem;
+      gap: 0.45rem;
+      padding: 0.45rem 1rem;
+      font-size: 0.85rem;
       font-weight: 600;
       color: var(--text-muted);
       border-radius: var(--radius-sm);
       transition: all var(--transition-fast);
+      white-space: nowrap;
     }
     .admin-tab-btn.active {
       background: var(--accent-primary);
       color: #FFFFFF;
     }
     .search-input {
-      width: 280px;
+      width: 100%;
+      max-width: 320px;
     }
     .data-table {
       width: 100%;
+      min-width: 600px;
       border-collapse: collapse;
       text-align: left;
     }
     .data-table th {
-      padding: 0.75rem 1rem;
-      font-size: 0.8rem;
+      padding: 0.7rem 0.85rem;
+      font-size: 0.78rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       color: var(--text-subtle);
       border-bottom: 1px solid var(--border-subtle);
+      white-space: nowrap;
     }
     .data-table td {
-      padding: 0.85rem 1rem;
+      padding: 0.75rem 0.85rem;
       border-bottom: 1px solid var(--border-subtle);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
+      white-space: nowrap;
     }
     .table-swatch {
       display: block;
-      width: 26px;
-      height: 26px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       border: 1.5px solid rgba(255, 255, 255, 0.2);
     }
     .brand-badge {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       background: var(--bg-card-hover);
-      padding: 0.2rem 0.6rem;
+      padding: 0.15rem 0.5rem;
       border-radius: 4px;
       color: #38BDF8;
     }
     .hex-pill {
       font-family: monospace;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       background: var(--bg-card);
-      padding: 0.2rem 0.5rem;
+      padding: 0.15rem 0.45rem;
       border-radius: 4px;
     }
     .patterns-admin-grid {
@@ -415,10 +425,11 @@ import { WallpaperPattern } from '../../models/pattern.model';
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(9, 13, 22, 0.82);
+      background: rgba(9, 13, 22, 0.85);
       backdrop-filter: blur(8px);
       z-index: 200;
       padding: 1rem;
+      overflow-y: auto;
     }
     .modal-card {
       width: 100%;
@@ -426,31 +437,71 @@ import { WallpaperPattern } from '../../models/pattern.model';
       background: var(--bg-surface);
       border: 1px solid var(--border-highlight);
       border-radius: var(--radius-xl);
-      padding: 1.75rem;
+      padding: 1.5rem;
+      max-height: 90vh;
+      overflow-y: auto;
     }
-    .grid-2 {
+    .modal-grid-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
     }
+    .color-picker-input {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+    .close-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+    }
+    .close-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.08);
+    }
     .toast-feedback {
       position: fixed;
-      bottom: 2rem;
-      right: 2rem;
+      bottom: calc(75px + var(--safe-bottom));
+      right: 1.5rem;
       background: #10B981;
       color: #FFFFFF;
-      padding: 0.7rem 1.4rem;
+      padding: 0.65rem 1.25rem;
       border-radius: var(--radius-full);
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 600;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.45rem;
       box-shadow: var(--shadow-lg);
       z-index: 999;
     }
+
     @media (max-width: 1024px) {
       .kpi-grid { grid-template-columns: repeat(2, 1fr); }
       .patterns-admin-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      .admin-page { padding: 1rem 0.75rem 4rem; }
+      .page-header { flex-direction: column; align-items: flex-start; gap: 0.85rem; }
+      .header-btns { width: 100%; justify-content: space-between; }
+      .header-btns .btn-primary { flex: 1; }
+      .search-wrapper { width: 100%; }
+      .search-input { max-width: 100%; }
+      .patterns-admin-grid { grid-template-columns: 1fr; }
+      .modal-grid-2 { grid-template-columns: 1fr; }
+      .page-title { font-size: 1.6rem; }
+      .toast-feedback { right: 1rem; left: 1rem; justify-content: center; }
+    }
+    @media (max-width: 480px) {
+      .kpi-grid { grid-template-columns: 1fr 1fr; gap: 0.65rem; }
+      .kpi-card { padding: 0.85rem; }
+      .kpi-value { font-size: 1.6rem; }
     }
   `]
 })
